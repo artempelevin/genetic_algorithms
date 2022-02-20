@@ -1,0 +1,29 @@
+from typing import Optional, Callable, Any
+
+import numpy as np
+
+def f_(x: float) -> float:
+    return x*x
+
+
+def tournament_selection(population: np.array, f: Callable, n: int, k: Optional[int] = 2) -> np.array:
+    """
+    Турнирный отбор. Отбираются k-хромосом n-раз и в каждом таком турнире выбирается лучшая хромосома.
+    :param population: Текущая популяция, представленная массивом хромосом.
+    :param f: Фитнес-функция, благодаря которой выбирается лучшая хромосома в турнире.
+    :param n: Кол-во проводимых турниров.
+    :param k: Кол-во хромосом, участвующих в турнире (по умолчанию 2).
+    :return: Новая популяция, состоящая из n-элементов - победителей турниров.
+    """
+    new_population = []
+    for _ in range(n):
+        random_chromosomes = np.random.choice(population, size=k)
+        values = [f(x) for x in random_chromosomes]
+        min_value = min(values)
+        new_population.append(random_chromosomes[values.index(min_value)])
+
+    return np.array(new_population)
+
+
+if __name__ == '__main__':
+    print(tournament_selection(population=np.array([1, 2, 3, 4, 5]), f=f_, n=3, k=2))
