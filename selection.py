@@ -2,8 +2,9 @@ from typing import Optional, Callable, Any
 
 import numpy as np
 
-def f_(x: float) -> float:
-    return x*x
+
+def f_(x: Any) -> Any:
+    return x * x
 
 
 def tournament_selection(population: np.array, f: Callable, n: int, k: Optional[int] = 2) -> np.array:
@@ -25,5 +26,20 @@ def tournament_selection(population: np.array, f: Callable, n: int, k: Optional[
     return np.array(new_population)
 
 
+def truncation_selection(population: np.array, f: Callable, l: float) -> np.array:
+    """
+    Селекция усечением. Отбираются ln лучших хромосом, где l-порог отсечения.
+    :param population: Текущая популяция, представленная массивом хромосом.
+    :param f: Фитнес-функция, благодаря которой выбирается лучшая хромосома в турнире.
+    :param l: Порог отсечения в диапазоне 0 < l < 1. Чем меньше l, тем сильнее давление селекции.
+    :return: Новая популяция, состоящая из n-элементов - победителей турниров.
+    """
+    assert (0 < l < 1)
+    f_ = np.vectorize(f)
+    values = f_(population)
+    return np.sort(np.dstack((population, values)), axis=1)[0, :int(population.size * l), 0]
+
+
 if __name__ == '__main__':
-    print(tournament_selection(population=np.array([1, 2, 3, 4, 5]), f=f_, n=3, k=2))
+    population_ = np.array([10, 12, 3, 4, 5])
+    print(truncation_selection(population=population_, f=f_, l=0.5))
